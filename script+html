@@ -1,0 +1,50 @@
+<!-- Language Selector in Footer -->
+<div id="translation-footer" style="padding: 10px; background: #f8f8f8; border-top: 1px solid #ccc; text-align: center;">
+  <label for="language-selector">Translate page:</label>
+  <select id="language-selector">
+    <option value="">Select Language</option>
+    <option value="Arabic">Arabic</option>
+    <option value="Spanish">Spanish</option>
+    <option value="French">French</option>
+    <option value="German">German</option>
+    <!-- Add additional languages as needed -->
+  </select>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#language-selector").on("change", function() {
+      var targetLanguage = $(this).val();
+      if (!targetLanguage) return;
+
+      var originalText = $("#main-outlet").text();
+
+      $("#main-outlet").append("<p id='translation-loading'>Translating...</p>");
+
+      $.ajax({
+        url: "https://yourdomain.com/api/translate.php", 
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          text: originalText,
+          targetLanguage: targetLanguage
+        }),
+        success: function(response) {
+          $("#translation-loading").remove();
+          // Ensure the response contains the expected structure.
+          if (response.choices && response.choices.length > 0) {
+            $("#main-outlet").html(response.choices[0].message.content.trim());
+          } else {
+            $("#main-outlet").append("<p>Translation error: Unexpected response.</p>");
+          }
+        },
+        error: function(xhr, status, error) {
+          $("#translation-loading").remove();
+          alert("Translation failed. Please try again later.");
+          console.error(error);
+        }
+      });
+    });
+  });
+</script>
